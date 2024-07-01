@@ -1,73 +1,111 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# URL Shortener Service
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This project is a URL shortening service built with NestJS. It allows users to shorten long URLs, decode shortened URLs back to their original form, and track statistics for each shortened URL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Prerequisites
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Node.js (>= 14.x)
+- npm (>= 6.x)
 
 ## Installation
 
-```bash
-$ npm install
-```
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/abahwisdom/url-shortener.git
+    cd url-shortener
+    ```
 
-## Running the app
+2. Install the dependencies:
+    ```bash
+    npm install
+    ```
 
-```bash
-# development
-$ npm run start
+## Configuration
 
-# watch mode
-$ npm run start:dev
+1. Create a `.env` file in the root directory and add the following environment variables:
+    ```
+    PORT=3000
+    BASE_PATH=http://localhost:3000
+    ```
 
-# production mode
-$ npm run start:prod
-```
+## Running the Application
 
-## Test
+1. Start the application in development mode:
+    ```bash
+    npm run start:dev
+    ```
 
-```bash
-# unit tests
-$ npm run test
+2. The application will be running at:
+    ```
+    http://localhost:3000
+    ```
 
-# e2e tests
-$ npm run test:e2e
+3. To start the application in production mode:
+    ```bash
+    npm run start:prod
+    ```
 
-# test coverage
-$ npm run test:cov
-```
+## Testing
 
-## Support
+1. Run the end-to-end tests:
+    ```bash
+    npm run test:e2e
+    ```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+2. Run the unit tests:
+    ```bash
+    npm run test
+    ```
 
-## Stay in touch
+3. Run the tests with coverage:
+    ```bash
+    npm run test:cov
+    ```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Linting and Formatting
+
+1. Run the linter:
+    ```bash
+    npm run lint
+    ```
+
+2. Automatically fix linting issues:
+    ```bash
+    npm run lint:fix
+    ```
+
+3. Format the code with Prettier:
+    ```bash
+    npm run format
+    ```
+
+## Project Structure
+
+- `src/`: Contains the source code of the application.
+  - `app.module.ts`: The root module of the application.
+  - `main.ts`: The entry point of the application.
+  - `url/`: Contains the URL shortening related modules, controllers, and services.
+- `test/`: Contains the end-to-end tests.
+- `package.json`: Contains the project dependencies and scripts.
+- `tsconfig.json`: TypeScript configuration file.
+
+## API Endpoints
+
+- `POST /encode`: Encode a long URL to a short URL.
+  - Request Body: `{ "longUrl": "https://example.com" }`
+  - Response: `{ "shortUrl": "http://localhost:3000/abc123" }`
+
+- `POST /decode`: Decode a short URL to the original long URL.
+  - Request Body: `{ "shortUrl": "abc123" }`
+  - Response: `{ "longUrl": "https://example.com" }`
+
+- `GET /statistic/:urlPath`: Get statistics for a short URL.
+  - Response: `{ "longUrl": "https://example.com", "visits": 0 }`
+
+- `GET /:urlPath`: Redirect to the original long URL.
+  - Response: 302 Redirect to the original URL.
 
 ## License
 
-Nest is [MIT licensed](LICENSE).
+This project is licensed under the MIT License.
+

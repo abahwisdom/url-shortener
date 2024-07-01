@@ -35,11 +35,11 @@ export class UrlService {
     try {
       const existingURL = await this.urlRepository.findOneBy({ longUrl: normalizeUrl(longUrl) });
       if (existingURL) {
-        return `${process.env.BASE_PATH}/${existingURL.urlCode}`;
+        return `${(process.env.BASE_PATH || "http://localhost:3000")}/${existingURL.urlCode}`;
       }
 
       const urlCode = nanoid(10);
-      const shortUrl = `${process.env.BASE_PATH}/${urlCode}`;
+      const shortUrl = `${(process.env.BASE_PATH || "http://localhost:3000")}/${urlCode}`;
       const url = this.urlRepository.create({ urlCode, longUrl: normalizeUrl(longUrl) });
       await this.urlRepository.save(url);
 

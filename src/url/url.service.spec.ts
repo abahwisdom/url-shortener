@@ -43,7 +43,7 @@ describe('UrlService', () => {
       jest.spyOn(repository, 'findOneBy').mockResolvedValue({ longUrl, urlCode } as Url);
 
       const result = await service.encode(longUrl);
-      expect(result).toBe(`${process.env.BASE_PATH}/${urlCode}`);
+      expect(result).toBe(`${(process.env.BASE_PATH || "http://localhost:3000")}/${urlCode}`);
     });
 
     it('should create a new short URL if the long URL is not encoded', async () => {
@@ -54,7 +54,7 @@ describe('UrlService', () => {
       // jest.mock("nanoid", () => {   return { nanoid: () => "abc123" } })
 
       const result = await service.encode(longUrl);
-      expect(result).toBe(`${process.env.BASE_PATH}/abc123`);
+      expect(result).toBe(`${(process.env.BASE_PATH || "http://localhost:3000")}/abc123`);
     });
 
     it('should throw InternalServerErrorException if an error occurs', async () => {

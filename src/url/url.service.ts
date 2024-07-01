@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Url } from './url.entity';
 import { isURL } from 'class-validator';
 import { nanoid } from 'nanoid';
+import { normalizeUrl } from 'src/utils/url.utils';
 
 @Injectable()
 export class UrlService {
@@ -12,51 +13,56 @@ export class UrlService {
     private readonly urlRepository: Repository<Url>,
   ) {}
 
-  async encode(longUrl: string): Promise<string> {
-    if (!isURL(longUrl)) {
-        throw new BadRequestException('String Must be a Valid URL');
+  private async findUrlByCode(urlCode: string): Promise<Url> {
+    if (!urlCode) {
+      throw new BadRequestException('Short URL must be provided');
     }
 
-    //check if the URL has already been shortened
-    const existingURL = await this.urlRepository.findOneBy({ longUrl });
-    //return it if it exists
-    if (existingURL){ return `http://localhost:3000/${existingURL.urlCode}`  };
-
-    const urlCode = nanoid(10);
-    const shortUrl = `http://localhost:3000/${urlCode}`;
-
-    const url = this.urlRepository.create({ urlCode, longUrl });
-    await this.urlRepository.save(url);
-
-    return shortUrl;
-  }
-
-  async decode(urlCode: string): Promise<string> {
     const url = await this.urlRepository.findOneBy({ urlCode });
 
     if (!url) {
       throw new NotFoundException('Short URL not found');
     }
 
+    return url;
+  }
+
+  async encode(longUrl: string): Promise<string> {
+    if (!isURL(longUrl)) {
+      throw new BadRequestException('String Must be a Valid URL');
+    }
+
+    try {
+      const existingURL = await this.urlRepository.findOneBy({ longUrl });
+      if (existingURL) {
+        return `http://localhost:3000/${existingURL.urlCode}`;
+      }
+
+      const urlCode = nanoid(10);
+      const shortUrl = `http://localhost:3000/${urlCode}`;
+      const url = this.urlRepository.create({ urlCode, longUrl: normalizeUrl(longUrl) });
+      await this.urlRepository.save(url);
+
+      return shortUrl;
+      
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to shorten URL');
+    }
+  }
+
+  async decode(urlCode: string): Promise<string> {
+    const url = await this.findUrlByCode(urlCode);
     return url.longUrl;
   }
 
   async getStatistics(urlPath: string): Promise<{ longUrl: string; visits: number }> {
-    const url = await this.urlRepository.findOneBy({ urlCode: urlPath });
-
-    if (!url) {
-      throw new NotFoundException('Statistics not found for this URL path');
-    }
-
+    const url = await this.findUrlByCode(urlPath);
     return { longUrl: url.longUrl, visits: url.visits };
   }
 
   async incrementVisits(urlPath: string): Promise<void> {
-    const url = await this.urlRepository.findOneBy({ urlCode: urlPath });
-
-    if (url) {
-      url.visits += 1;
-      await this.urlRepository.save(url);
-    }
+    const url = await this.findUrlByCode(urlPath);
+    url.visits += 1;
+    await this.urlRepository.save(url);
   }
 }

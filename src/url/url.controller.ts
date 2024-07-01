@@ -1,5 +1,6 @@
 import { Controller, Post, Body, Get, Param, Res } from '@nestjs/common';
 import { UrlService } from './url.service';
+import { normalizeUrl } from 'src/utils/url.utils';
 
 @Controller()
 export class UrlController {
@@ -28,9 +29,7 @@ export class UrlController {
     const longUrl = await this.urlService.decode(urlPath);
     await this.urlService.incrementVisits(urlPath);
 
-    // Ensure the longUrl includes the protocol
-    const isFullUrl = /^https?:\/\//i.test(longUrl);
-    const redirectUrl = isFullUrl ? longUrl : `http://${longUrl}`;
+    const redirectUrl = normalizeUrl(longUrl);
 
     return res.redirect(redirectUrl);
   }

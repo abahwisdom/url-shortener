@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Param, Res } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Res, BadRequestException } from '@nestjs/common';
 import { UrlService } from './url.service';
 import { normalizeUrl } from 'src/utils/url.utils';
 
@@ -14,6 +14,9 @@ export class UrlController {
 
   @Post('decode')
   async decode(@Body('shortUrl') shortUrl: string) {
+    if (!shortUrl) {
+      throw new BadRequestException('shortUrl must be provided');
+    }
     const longUrl = await this.urlService.decode(shortUrl);
     return { longUrl };
   }

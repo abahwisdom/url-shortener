@@ -33,18 +33,18 @@ export class UrlService {
     }
 
     try {
-      const existingURL = await this.urlRepository.findOneBy({ longUrl });
+      const existingURL = await this.urlRepository.findOneBy({ longUrl: normalizeUrl(longUrl) });
       if (existingURL) {
-        return `http://localhost:3000/${existingURL.urlCode}`;
+        return `${process.env.BASE_PATH}/${existingURL.urlCode}`;
       }
 
       const urlCode = nanoid(10);
-      const shortUrl = `http://localhost:3000/${urlCode}`;
+      const shortUrl = `${process.env.BASE_PATH}/${urlCode}`;
       const url = this.urlRepository.create({ urlCode, longUrl: normalizeUrl(longUrl) });
       await this.urlRepository.save(url);
 
       return shortUrl;
-      
+
     } catch (error) {
       throw new InternalServerErrorException('Failed to shorten URL');
     }

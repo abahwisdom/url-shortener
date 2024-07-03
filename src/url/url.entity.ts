@@ -13,4 +13,10 @@ export class Url {
 
     @Column({ default: 0 })
     visits: number;
+
+    @Column({ type: 'datetime' })
+    creationDate: Date;
+
+    @Column('simple-json')
+    clicksByDate: { [key: string]: number };
 }

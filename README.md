@@ -100,7 +100,7 @@ This project is a URL shortening service built with NestJS. It allows users to s
   - Response: `{ "longUrl": "https://example.com" }`
 
 - `GET /statistic/:urlPath`: Get statistics for a short URL.
-  - Response: `{ "longUrl": "https://example.com", "visits": 0 }`
+  - Response: `{ "longUrl": "https://example.com", "visits": 0, "creationDate": "2023-10-01", "clicksByDate": { "2023-10-01": 0 } }`
 
 - `GET /:urlPath`: Redirect to the original long URL.
   - Response: 302 Redirect to the original URL.

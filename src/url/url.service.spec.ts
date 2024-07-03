@@ -51,7 +51,6 @@ describe('UrlService', () => {
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(null);
       jest.spyOn(repository, 'create').mockReturnValue({} as Url);
       jest.spyOn(repository, 'save').mockResolvedValue({} as Url);
-      // jest.mock("nanoid", () => {   return { nanoid: () => "abc123" } })
 
       const result = await service.encode(longUrl);
       expect(result).toBe(`${(process.env.BASE_PATH || "http://localhost:3000")}/abc123`);
@@ -89,10 +88,13 @@ describe('UrlService', () => {
     it('should return the statistics for a given URL path', async () => {
       const longUrl = 'https://example.com';
       const visits = 5;
-      jest.spyOn(repository, 'findOneBy').mockResolvedValue({ longUrl, visits } as Url);
+      const creationDate = new Date();
+      const clicksByDate = { '2023-10-01': 3 };
+      const mockUrl: Url = { id: 1, urlCode: 'abc123', longUrl, visits, creationDate, clicksByDate } as Url;
+      jest.spyOn(repository, 'findOneBy').mockResolvedValue(mockUrl);
 
       const result = await service.getStatistics('abc123');
-      expect(result).toEqual({ longUrl, visits });
+      expect(result).toEqual({ longUrl, visits, creationDate, clicksByDate });
     });
 
     it('should throw NotFoundException if the URL path is not found', async () => {
@@ -104,12 +106,22 @@ describe('UrlService', () => {
 
   describe('incrementVisits', () => {
     it('should increment the visit count for a given URL path', async () => {
-      const url = { visits: 5 } as Url;
+      const url = { visits: 5, clicksByDate: {} } as Url;
       jest.spyOn(repository, 'findOneBy').mockResolvedValue(url);
       jest.spyOn(repository, 'save').mockResolvedValue({} as Url);
 
       await service.incrementVisits('abc123');
       expect(url.visits).toBe(6);
+    });
+
+    it('should update clicksByDate for the current date', async () => {
+      const today = new Date().toISOString().split('T')[0];
+      const url = { visits: 5, clicksByDate: {} } as Url;
+      jest.spyOn(repository, 'findOneBy').mockResolvedValue(url);
+      jest.spyOn(repository, 'save').mockResolvedValue({} as Url);
+
+      await service.incrementVisits('abc123');
+      expect(url.clicksByDate[today]).toBe(1);
     });
 
     it('should throw NotFoundException if the URL path is not found', async () => {
@@ -119,4 +131,3 @@ describe('UrlService', () => {
     });
   });
 });
-

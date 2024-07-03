@@ -27,7 +27,7 @@ export class UrlController {
     return stats;
   }
 
- @Get(':urlPath')
+  @Get(':urlPath')
   async redirect(@Param('urlPath') urlPath: string, @Res() res) {
     const longUrl = await this.urlService.decode(urlPath);
     await this.urlService.incrementVisits(urlPath);

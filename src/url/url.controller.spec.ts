@@ -72,7 +72,7 @@ describe('UrlController', () => {
   describe('getStatistics', () => {
     it('should return the statistics for a given URL path', async () => {
       const urlPath = 'abc123';
-      const stats = { longUrl: 'https://example.com', visits: 5 };
+      const stats = { longUrl: 'https://example.com', visits: 5, creationDate: new Date(), clicksByDate: { '2023-10-01': 3 } };
       jest.spyOn(service, 'getStatistics').mockResolvedValue(stats);
 
       const result = await controller.getStatistics(urlPath);

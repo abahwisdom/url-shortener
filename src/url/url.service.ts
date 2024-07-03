@@ -40,7 +40,7 @@ export class UrlService {
 
       const urlCode = nanoid(10);
       const shortUrl = `${(process.env.BASE_PATH || "http://localhost:3000")}/${urlCode}`;
-      const url = this.urlRepository.create({ urlCode, longUrl: normalizeUrl(longUrl) });
+      const url = this.urlRepository.create({ urlCode, longUrl: normalizeUrl(longUrl), creationDate: new Date(), clicksByDate: {} });
       await this.urlRepository.save(url);
 
       return shortUrl;
@@ -55,14 +55,21 @@ export class UrlService {
     return url.longUrl;
   }
 
-  async getStatistics(urlPath: string): Promise<{ longUrl: string; visits: number }> {
+  async getStatistics(urlPath: string): Promise<{ longUrl: string; visits: number; creationDate: Date; clicksByDate: Record<string, number> }> {
     const url = await this.findUrlByCode(urlPath);
-    return { longUrl: url.longUrl, visits: url.visits };
+    return { longUrl: url.longUrl, visits: url.visits, creationDate: url.creationDate, clicksByDate: url.clicksByDate };
   }
 
   async incrementVisits(urlPath: string): Promise<void> {
     const url = await this.findUrlByCode(urlPath);
     url.visits += 1;
+
+    const today = new Date().toISOString().split('T')[0];
+    if (!url.clicksByDate[today]) {
+      url.clicksByDate[today] = 0;
+    }
+    url.clicksByDate[today] += 1;
+
     await this.urlRepository.save(url);
   }
 }

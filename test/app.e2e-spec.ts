@@ -60,6 +60,8 @@ describe('UrlController (e2e)', () => {
       .expect((res) => {
         expect(res.body).toHaveProperty('longUrl', 'https://example.com');
         expect(res.body).toHaveProperty('visits', 0);
+        expect(res.body).toHaveProperty('creationDate');
+        expect(res.body).toHaveProperty('clicksByDate');
       });
   });
 
